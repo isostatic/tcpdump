@@ -217,7 +217,7 @@ srt_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 	/* srt */
 	const u_int *ip = (const u_int *)hdr;
         u_int dlen, retransmit;
-	uint32_t i0, i1, i2, seq, msg, type;
+	uint32_t i0, i1, timestamp, seq, msg, type;
         char ctrl = 'd';
 
 	ndo->ndo_protocol = "srt";
@@ -229,13 +229,13 @@ srt_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 	dlen = len - 12; /* 12 byte header. First 4 = seqnum */
 	i0 = GET_BE_U_4(&((const u_int *)hdr)[0]);
 	i1 = GET_BE_U_4(&((const u_int *)hdr)[1]);
-	i2 = GET_BE_U_4(&((const u_int *)hdr)[2]); // timestamp
+	timestamp = GET_BE_U_4(&((const u_int *)hdr)[2]); // timestamp
         seq = i0 & 0x7fffffff; // sequence number is last 31 bits
         if (i0 >> 31) { // first bit is 1 for ctrl, 0 for data
             ctrl = 'c';
         }
 
-        retransmit = i1 & 0x04000000;
+        retransmit = (i1 >> 26) & 1;
 
 
 	ND_PRINT("udp/srt bytes=%u ctrl=%c seq=%u retransmit=%u timestamp=%u",
@@ -243,7 +243,7 @@ srt_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 		ctrl,
 		seq,
 		retransmit,
-                i2);
+                timestamp);
 }
 
 static const u_char *
