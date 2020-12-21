@@ -290,6 +290,7 @@ extern void nd_pop_all_packet_info(netdissect_options *);
 #define PT_PTP		18	/* PTP */
 #define PT_SOMEIP	19	/* Autosar SOME/IP Protocol */
 #define PT_DOMAIN	20	/* Domain Name System (DNS) */
+#define PT_SRT		21	/* Secure Reliable Transfer protocol */
 
 #define ND_MIN(a,b) ((a)>(b)?(b):(a))
 #define ND_MAX(a,b) ((b)>(a)?(b):(a))

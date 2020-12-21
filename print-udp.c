@@ -211,6 +211,41 @@ rtp_print(netdissect_options *ndo, const u_char *hdr, u_int len)
 	}
 }
 
+static void
+srt_print(netdissect_options *ndo, const u_char *hdr, u_int len)
+{
+	/* srt */
+	const u_int *ip = (const u_int *)hdr;
+        u_int dlen, retransmit;
+	uint32_t i0, i1, i2, seq, msg, type;
+        char ctrl = 'd';
+
+	ndo->ndo_protocol = "srt";
+	if (len < 8) {
+		ND_PRINT("udp/srt, length %u < 8", len);
+		return;
+	}
+
+	dlen = len - 12; /* 12 byte header. First 4 = seqnum */
+	i0 = GET_BE_U_4(&((const u_int *)hdr)[0]);
+	i1 = GET_BE_U_4(&((const u_int *)hdr)[1]);
+	i2 = GET_BE_U_4(&((const u_int *)hdr)[2]); // timestamp
+        seq = i0 & 0x7fffffff; // sequence number is last 31 bits
+        if (i0 >> 31) { // first bit is 1 for ctrl, 0 for data
+            ctrl = 'c';
+        }
+
+        retransmit = i1 & 0x04000000;
+
+
+	ND_PRINT("udp/srt bytes=%u ctrl=%c seq=%u retransmit=%u timestamp=%u",
+		dlen,
+		ctrl,
+		seq,
+		retransmit,
+                i2);
+}
+
 static const u_char *
 rtcp_print(netdissect_options *ndo, const u_char *hdr, const u_char *ep)
 {
@@ -454,6 +489,11 @@ udp_print(netdissect_options *ndo, const u_char *bp, u_int length,
 		case PT_RTP:
 			udpipaddr_print(ndo, ip, sport, dport);
 			rtp_print(ndo, cp, length);
+			break;
+
+		case PT_SRT:
+			udpipaddr_print(ndo, ip, sport, dport);
+			srt_print(ndo, cp, length);
 			break;
 
 		case PT_RTCP:

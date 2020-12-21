@@ -1785,6 +1785,8 @@ main(int argc, char **argv)
 				ndo->ndo_packettype = PT_RPC;
 			else if (ascii_strcasecmp(optarg, "rtp") == 0)
 				ndo->ndo_packettype = PT_RTP;
+			else if (ascii_strcasecmp(optarg, "srt") == 0)
+				ndo->ndo_packettype = PT_SRT;
 			else if (ascii_strcasecmp(optarg, "rtcp") == 0)
 				ndo->ndo_packettype = PT_RTCP;
 			else if (ascii_strcasecmp(optarg, "snmp") == 0)
